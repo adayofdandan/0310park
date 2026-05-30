@@ -1,0 +1,120 @@
+# Blender 4.4.3 MTL File: 'Fire extinguisher.blend'
+# www.blender.org
+
+newmtl Материал
+Ns 490.000061
+Ka 0.431818 0.431818 0.431818
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 3
+map_Kd D:/3D/Огнетушитель/Текстуры/Balloon/Материал_BaseColor.<UDIM>.png
+map_refl D:/3D/Огнетушитель/Текстуры/Balloon/Материал_Metallic.<UDIM>.png
+map_d D:/3D/Огнетушитель/Текстуры/Balloon/Материал_Alpha.<UDIM>.png
+map_Bump D:/3D/Огнетушитель/Текстуры/Balloon/Материал_Normal.<UDIM>.png
+
+newmtl Материал.001
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 3
+map_Kd D:/3D/Огнетушитель/Текстуры/Locking device/Материал.001_BaseColor.<UDIM>.png
+map_refl D:/3D/Огнетушитель/Текстуры/Locking device/Материал.001_Metallic.<UDIM>.png
+map_d D:/3D/Огнетушитель/Текстуры/Locking device/Материал.001_Alpha.<UDIM>.png
+map_Bump -bm 0.300000 D:/3D/Огнетушитель/Текстуры/Locking device/Материал.001_Normal.<UDIM>.png
+
+newmtl Материал.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 3
+map_Kd D:/3D/Огнетушитель/Текстуры/Tube/Материал.002_BaseColor.<UDIM>.png
+map_refl D:/3D/Огнетушитель/Текстуры/Tube/Материал.002_Metallic.<UDIM>.png
+map_d D:/3D/Огнетушитель/Текстуры/Tube/Материал.002_Alpha.<UDIM>.png
+map_Bump D:/3D/Огнетушитель/Текстуры/Tube/Материал.002_Normal.<UDIM>.png
+
+newmtl Материал.003
+Ns 360.000000
+Ka 0.481818 0.481818 0.481818
+Ks 0.854545 0.854545 0.854545
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 3
+map_Kd D:/3D/Огнетушитель/Текстуры/Locking nut/Материал.003_BaseColor.<UDIM>.png
+map_refl D:/3D/Огнетушитель/Текстуры/Locking nut/Материал.003_Metallic.<UDIM>.png
+map_d D:/3D/Огнетушитель/Текстуры/Locking nut/Материал.003_Alpha.<UDIM>.png
+map_Bump -bm 0.300000 D:/3D/Огнетушитель/Текстуры/Locking nut/Материал.003_Normal.<UDIM>.png
+
+newmtl Материал.004
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd D:/3D/Огнетушитель/Текстуры/82203089_02.jpg
+
+newmtl Материал.006
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd D:/3D/Огнетушитель/Текстуры/Lever/Материал.006_BaseColor.<UDIM>.png
+map_refl D:/3D/Огнетушитель/Текстуры/Lever/Материал.006_Metallic.<UDIM>.png
+map_d D:/3D/Огнетушитель/Текстуры/Lever/Материал.006_Alpha.<UDIM>.png
+map_Bump -bm 0.200000 D:/3D/Огнетушитель/Текстуры/Lever/Материал.006_Normal.<UDIM>.png
+
+newmtl Материал.007
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd D:/3D/Огнетушитель/Текстуры/Handle/Материал.007_BaseColor.<UDIM>.png
+map_refl D:/3D/Огнетушитель/Текстуры/Handle/Материал.007_Metallic.<UDIM>.png
+map_d D:/3D/Огнетушитель/Текстуры/Handle/Материал.007_Alpha.<UDIM>.png
+map_Bump -bm 0.200000 D:/3D/Огнетушитель/Текстуры/Handle/Материал.007_Normal.<UDIM>.png
+
+newmtl Материал.008
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd D:/3D/Огнетушитель/Текстуры/Lock/Материал.008_BaseColor.<UDIM>.png
+map_refl D:/3D/Огнетушитель/Текстуры/Lock/Материал.008_Metallic.<UDIM>.png
+map_d D:/3D/Огнетушитель/Текстуры/Lock/Материал.008_Alpha.<UDIM>.png
+map_Bump -bm 0.200000 D:/3D/Огнетушитель/Текстуры/Lock/Материал.008_Normal.<UDIM>.png
+
+newmtl Материал.009
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd D:/3D/Огнетушитель/Текстуры/Fastening/Материал.009_BaseColor.<UDIM>.png
+map_refl D:/3D/Огнетушитель/Текстуры/Fastening/Материал.009_Metallic.<UDIM>.png
+map_d D:/3D/Огнетушитель/Текстуры/Fastening/Материал.009_Alpha.<UDIM>.png
+map_Bump -bm 0.300000 D:/3D/Огнетушитель/Текстуры/Fastening/Материал.009_Normal.<UDIM>.png
+
+newmtl Материал.010
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd D:/3D/Огнетушитель/Текстуры/Trumpet/Материал.010_BaseColor.<UDIM>.png
+map_refl D:/3D/Огнетушитель/Текстуры/Trumpet/Материал.010_Metallic.<UDIM>.png
+map_d D:/3D/Огнетушитель/Текстуры/Trumpet/Материал.010_Alpha.<UDIM>.png
+map_Bump -bm 0.300000 D:/3D/Огнетушитель/Текстуры/Trumpet/Материал.010_Normal.<UDIM>.png

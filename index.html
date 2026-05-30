@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>0310 park</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after {
+      margin: 0; padding: 0; box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+
+    /* ── Background ── */
+    .bg {
+      position: fixed; inset: 0; z-index: 0;
+      background: url('images/bg.jpg') center/cover no-repeat;
+    }
+    .bg::after {
+      content: ''; position: absolute; inset: 0;
+      background: rgba(0, 0, 0, 0.08);
+    }
+
+    /* ── Title ── */
+    .title {
+      position: fixed;
+      top: clamp(18px, 4.5vh, 46px);
+      left: 50%; transform: translateX(-50%);
+      z-index: 10;
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(38px, 6.5vw, 82px);
+      white-space: nowrap;
+      color: #fff;
+      text-shadow:
+        0 2px 0 rgba(45, 120, 45, 0.95),
+        0 4px 0 rgba(25,  95, 25, 0.75),
+        0 7px 18px rgba(0, 0, 0, 0.38),
+        0 0 55px rgba(170, 255, 150, 0.22);
+    }
+
+    /* ── Scene ── */
+    .scene { position: fixed; inset: 0; z-index: 5; }
+
+    /* ── Dog 3D canvas ── */
+    #dog3d {
+      position: absolute;
+      left: 50%; top: 52%;
+      width: clamp(220px, 28vw, 360px);
+      height: clamp(220px, 28vw, 360px);
+      z-index: 6;
+      pointer-events: none;
+      animation: dogBob 3.5s ease-in-out infinite;
+    }
+    @keyframes dogBob {
+      0%, 100% { transform: translate(-50%, -50%); }
+      50%       { transform: translate(-50%, calc(-50% - 14px)); }
+    }
+
+    /* ── CLICK ME hint ── */
+    .click-hint {
+      position: absolute;
+      left: 50%; top: 50%;
+      transform: translate(72px, -128px);
+      background: #fff;
+      color: #111;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      padding: 5px 10px;
+      border: 2px solid #222;
+      border-radius: 3px;
+      pointer-events: none;
+      z-index: 7;
+      animation: hintBounce 2.5s ease-in-out infinite;
+    }
+    .click-hint::before {
+      content: '';
+      position: absolute;
+      bottom: -7px; left: 13px;
+      width: 8px; height: 8px;
+      background: #fff;
+      border-right: 2px solid #222;
+      border-bottom: 2px solid #222;
+      transform: rotate(45deg);
+    }
+    @keyframes hintBounce {
+      0%, 100% { transform: translate(72px, -128px); }
+      50%       { transform: translate(72px, -136px); }
+    }
+
+    /* ── Icon wrapper ── */
+    .icon {
+      position: absolute;
+      left: 50%; top: 52%;
+      width: 122px; height: 122px;
+      cursor: pointer; z-index: 8;
+      transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    /* ── Icon 3D canvas ── */
+    .icon:hover .icon-canvas { filter: brightness(1.08); }
+
+    /* ── Float animation ── */
+    @keyframes floatUp {
+      0%, 100% { transform: translateY(0px);   }
+      50%       { transform: translateY(-10px); }
+    }
+    .icon.anim-on .icon-canvas {
+      animation: floatUp var(--fd, 3s) ease-in-out infinite;
+      animation-delay: var(--fl, 0s);
+    }
+
+    /* Disable CSS transition during JS-driven orbit */
+    .scene.orbiting .icon { transition: none; }
+
+    /* ── Controls (bottom-right) ── */
+    .controls {
+      position: fixed; bottom: 20px; right: 20px;
+      display: flex; gap: 8px; z-index: 20;
+    }
+    .ctrl-btn {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 255, 255, 0.88);
+      background: rgba(255, 255, 255, 0.78);
+      backdrop-filter: blur(8px);
+      font-size: 16px; font-weight: 700;
+      color: #333; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.15s, background 0.2s;
+    }
+    .ctrl-btn:hover { transform: scale(1.1); }
+    .ctrl-btn.active {
+      background: rgba(95, 180, 80, 0.85);
+      border-color: rgba(55, 140, 45, 0.9);
+      color: #fff;
+    }
+
+    /* ── 3D 아이콘 캔버스 ── */
+    .icon-canvas {
+      width: 100%; height: 100%;
+      border-radius: 18px;
+      display: block;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg"></div>
+<h1 class="title">0310 park</h1>
+
+<div class="scene" id="scene">
+  <canvas id="dog3d"></canvas>
+  <div class="click-hint">CLICK ME</div>
+
+  <div class="icon anim-on" data-icon="apple"
+       data-href="#"
+       style="--fd:3.1s;--fl:0.0s"><canvas id="icon-apple"    class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="cake"
+       data-href="#"
+       style="--fd:2.8s;--fl:0.5s"><canvas id="icon-cake"     class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="instagram"
+       data-href="https://www.instagram.com/lets_slow.kr/"
+       style="--fd:3.4s;--fl:0.9s"><canvas id="icon-instagram" class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="cone"
+       data-href="#"
+       style="--fd:2.6s;--fl:1.3s"><canvas id="icon-cone"     class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="donut"
+       data-href="#"
+       style="--fd:2.9s;--fl:0.7s"><canvas id="icon-donut"    class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="flowers"
+       data-href="#"
+       style="--fd:3.5s;--fl:1.1s"><canvas id="icon-flowers"  class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="penguin"
+       data-href="#"
+       style="--fd:2.7s;--fl:1.5s"><canvas id="icon-penguin"  class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="pencil"
+       data-href="#"
+       style="--fd:3.3s;--fl:0.3s"><canvas id="icon-pencil"   class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="scissors"
+       data-href="#"
+       style="--fd:3.0s;--fl:0.8s"><canvas id="icon-scissors" class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="sneakers"
+       data-href="#"
+       style="--fd:2.5s;--fl:1.2s"><canvas id="icon-sneakers" class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="snoopy"
+       data-href="#"
+       style="--fd:3.6s;--fl:0.4s"><canvas id="icon-snoopy"   class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="trousers"
+       data-href="#"
+       style="--fd:2.8s;--fl:1.0s"><canvas id="icon-trousers" class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="fire"
+       data-href="#"
+       style="--fd:3.2s;--fl:0.6s"><canvas id="icon-fire"     class="icon-canvas"></canvas></div>
+
+  <div class="icon anim-on" data-icon="melon"
+       data-href="#"
+       style="--fd:3.1s;--fl:1.4s"><canvas id="icon-melon"    class="icon-canvas"></canvas></div>
+</div>
+
+<div class="controls">
+  <button class="ctrl-btn" id="btnReset" title="위치 초기화">↺</button>
+  <button class="ctrl-btn active" id="btnToggle">ON</button>
+</div>
+
+<script>
+// ── 아이콘 흩어진 초기 위치 (화면 중심 기준 px 오프셋) ──
+const SCATTER = [
+  { x: -340, y: -100 },  //  0: apple
+  { x: -240, y:  -15 },  //  1: cake
+  { x: -195, y:  165 },  //  2: instagram
+  { x: -295, y:  125 },  //  3: cone
+  { x:   95, y: -230 },  //  4: donut
+  { x:  260, y: -115 },  //  6: flowers
+  { x:  345, y:   80 },  //  7: music
+  { x:  290, y:  200 },  //  8: pencil
+  { x:  110, y:  265 },  //  9: scissors
+  { x:  -40, y:  270 },  // 10: sneakers
+  { x: -185, y:  245 },  // 11: snoopy
+  { x: -355, y: -205 },  // 12: trousers
+  { x:  115, y: -255 },  // 13: fire
+  { x:  360, y: -195 },  // 14: tree
+];
+
+const ORBIT_R  = 290;   // 궤도 반지름 (px)
+const ORBIT_RY = 0.28;  // 세로 압축 비율 (납작한 타원)
+
+const scene  = document.getElementById('scene');
+const icons  = Array.from(document.querySelectorAll('.icon'));
+const iconPaused = new Array(icons.length).fill(false);
+let orbiting = false;
+let animOn   = true;
+let rafId    = null;
+let orbitT0  = 0;
+
+// 화면 크기에 따른 스케일 (모바일 대응)
+function scale() {
+  const w = window.innerWidth;
+  if (w < 480) return 0.44;
+  if (w < 768) return 0.62;
+  return 1;
+}
+
+// 흩어진 위치로 복귀
+function applyScatter() {
+  const s = scale();
+  icons.forEach((el, i) => {
+    const { x, y } = SCATTER[i];
+    el.style.transition = 'transform 0.9s cubic-bezier(0.34,1.56,0.64,1)';
+    el.style.transform  = `translate(calc(-50% + ${x * s}px), calc(-50% + ${y * s}px))`;
+  });
+}
+
+// 궤도 회전 시작
+function startOrbit() {
+  if (orbiting) return;
+  orbiting = true;
+  scene.classList.add('orbiting');
+  icons.forEach(el => {
+    el.style.transition = 'none';
+  });
+  orbitT0 = performance.now();
+  const s = scale();
+  const r = ORBIT_R * s;
+
+  (function loop(now) {
+    if (!orbiting) return;
+    const t = (now - orbitT0) * 0.00044;
+    icons.forEach((el, i) => {
+      const a    = t + (i / icons.length) * Math.PI * 2;
+      const sinA = Math.sin(a);
+      const x    = Math.cos(a) * r;
+      const y    = sinA * r * ORBIT_RY;
+
+      if (iconPaused[i]) return;  // 클릭으로 일시정지 중
+      // sinA < 0 = 강아지 뒤쪽, sinA >= 0 = 앞쪽
+      el.style.zIndex   = sinA < 0 ? '5' : '7';  // 강아지(z:6) 기준 앞뒤
+      el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+    });
+    rafId = requestAnimationFrame(loop);
+  })(performance.now());
+}
+
+// 궤도 회전 중지
+function stopOrbit() {
+  orbiting = false;
+  cancelAnimationFrame(rafId);
+  scene.classList.remove('orbiting');
+  if (animOn) icons.forEach(el => el.classList.add('anim-on'));
+  icons.forEach(el => {
+    el.style.zIndex = '';
+  });
+  applyScatter();
+}
+
+// ── 길게 누르기 감지 ──
+let pressTimer   = null;
+let didLongPress = false;
+
+icons.forEach(el => {
+  // 마우스
+  el.addEventListener('mousedown', () => {
+    didLongPress = false;
+    pressTimer = setTimeout(() => {
+      didLongPress = true;
+      orbiting ? stopOrbit() : startOrbit();
+    }, 480);
+  });
+  el.addEventListener('mouseup',    () => clearTimeout(pressTimer));
+  el.addEventListener('mouseleave', () => clearTimeout(pressTimer));
+  el.addEventListener('click', () => {
+    if (didLongPress) { didLongPress = false; return; }
+    const idx = icons.indexOf(el);
+    if (orbiting && idx !== -1) {
+      iconPaused[idx] = true;
+      setTimeout(() => { iconPaused[idx] = false; }, 1500);
+    }
+    const h = el.dataset.href;
+    if (h && h !== '#') window.open(h, '_blank');
+  });
+
+  // 터치 (모바일)
+  el.addEventListener('touchstart', () => {
+    didLongPress = false;
+    pressTimer = setTimeout(() => {
+      didLongPress = true;
+      orbiting ? stopOrbit() : startOrbit();
+    }, 480);
+  }, { passive: true });
+  el.addEventListener('touchend', () => {
+    clearTimeout(pressTimer);
+    if (didLongPress) { didLongPress = false; return; }
+    const idx = icons.indexOf(el);
+    if (orbiting && idx !== -1) {
+      iconPaused[idx] = true;
+      setTimeout(() => { iconPaused[idx] = false; }, 1500);
+    }
+    const h = el.dataset.href;
+    if (h && h !== '#') window.open(h, '_blank');
+  });
+  el.addEventListener('touchcancel', () => clearTimeout(pressTimer));
+});
+
+// ── 리셋 버튼 (흩어졌다가 다시 궤도로) ──
+document.getElementById('btnReset').addEventListener('click', () => {
+  stopOrbit();
+  setTimeout(startOrbit, 1000);
+});
+
+// ── ON/OFF 토글 ──
+const btnToggle = document.getElementById('btnToggle');
+btnToggle.addEventListener('click', () => {
+  animOn = !animOn;
+  btnToggle.textContent = animOn ? 'ON' : 'OFF';
+  btnToggle.classList.toggle('active', animOn);
+  if (!orbiting) icons.forEach(el => el.classList.toggle('anim-on', animOn));
+  if (!animOn && orbiting) stopOrbit();
+});
+
+// ── 초기화: 잠깐 흩어졌다가 궤도 진입 ──
+applyScatter();
+setTimeout(startOrbit, 1200);
+</script>
+
+<!-- ── Three.js 3D 강아지 ── -->
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.161.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.161.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { OBJLoader } from 'three/addons/loaders/OBJLoader.js';
+import { MTLLoader } from 'three/addons/loaders/MTLLoader.js';
+
+const canvas   = document.getElementById('dog3d');
+const W = canvas.clientWidth  || 300;
+const H = canvas.clientHeight || 300;
+
+const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+renderer.setPixelRatio(window.devicePixelRatio);
+renderer.setSize(W, H);
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.shadowMap.enabled = true;
+
+const threeScene = new THREE.Scene();
+const camera     = new THREE.PerspectiveCamera(42, W / H, 0.01, 100);
+camera.position.set(0, 0.05, 3);
+
+// 조명
+const ambient = new THREE.AmbientLight(0xffffff, 2.2);
+threeScene.add(ambient);
+const sun = new THREE.DirectionalLight(0xfff5e0, 3);
+sun.position.set(2, 5, 4);
+sun.castShadow = true;
+threeScene.add(sun);
+const fill = new THREE.DirectionalLight(0xd0e8ff, 1.2);
+fill.position.set(-3, 1, -2);
+threeScene.add(fill);
+
+// GLB 로드
+let dogModel = null;
+const loader = new GLTFLoader();
+loader.load(
+  'images/icon_dog_002.glb',
+  (gltf) => {
+    dogModel = gltf.scene;
+
+    // 모델 중앙 정렬 & 크기 자동 맞춤
+    const box    = new THREE.Box3().setFromObject(dogModel);
+    const center = box.getCenter(new THREE.Vector3());
+    const size   = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const scale  = 1.8 / maxDim;
+
+    dogModel.position.sub(center);
+    dogModel.scale.setScalar(scale);
+    dogModel.rotation.y = Math.PI * 1.5;  // 270도
+
+    threeScene.add(dogModel);
+  },
+  undefined,
+  (err) => console.warn('GLB 로드 실패:', err)
+);
+
+// 애니메이션 루프
+function animate() {
+  requestAnimationFrame(animate);
+  // 강아지 회전 없음 — CSS dogBob 애니메이션만 사용
+  renderer.render(threeScene, camera);
+}
+animate();
+
+// 창 크기 변경 대응
+window.addEventListener('resize', () => {
+  const w = canvas.clientWidth;
+  const h = canvas.clientHeight;
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+  renderer.setSize(w, h);
+});
+
+// ── GLB 아이콘 로더 (강아지용) ──
+function load3DIcon(cvs, glbPath) {
+  const size = 122;
+  const iconRenderer = new THREE.WebGLRenderer({ canvas: cvs, alpha: true, antialias: true });
+  iconRenderer.setPixelRatio(window.devicePixelRatio);
+  iconRenderer.setSize(size, size);
+  iconRenderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const iconScene = new THREE.Scene();
+  const iconCam   = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
+  iconCam.position.set(0, 0, 3);
+
+  iconScene.add(new THREE.AmbientLight(0xffffff, 2.0));
+  const iLight = new THREE.DirectionalLight(0xffffff, 2.5);
+  iLight.position.set(2, 3, 4);
+  iconScene.add(iLight);
+
+  let iModel = null;
+  new GLTFLoader().load(glbPath, (gltf) => {
+    iModel = gltf.scene;
+    const box    = new THREE.Box3().setFromObject(iModel);
+    const center = box.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(...box.getSize(new THREE.Vector3()).toArray());
+    iModel.position.sub(center);
+    iModel.scale.setScalar(1.6 / maxDim);
+    iconScene.add(iModel);
+  });
+
+  (function loop() {
+    requestAnimationFrame(loop);
+    if (iModel) iModel.rotation.y += 0.012;
+    iconRenderer.render(iconScene, iconCam);
+  })();
+}
+
+// ── OBJ 아이콘 로더 ──
+function loadOBJIcon(cvs, dir, objFile, mtlFile) {
+  const size = 122;
+  const iconRenderer = new THREE.WebGLRenderer({ canvas: cvs, alpha: true, antialias: true });
+  iconRenderer.setPixelRatio(window.devicePixelRatio);
+  iconRenderer.setSize(size, size);
+  iconRenderer.outputColorSpace = THREE.SRGBColorSpace;
+
+  const iconScene = new THREE.Scene();
+  const iconCam   = new THREE.PerspectiveCamera(45, 1, 0.01, 100);
+  iconCam.position.set(0, 0, 3);
+
+  iconScene.add(new THREE.AmbientLight(0xffffff, 2.0));
+  const iLight = new THREE.DirectionalLight(0xffffff, 2.5);
+  iLight.position.set(2, 3, 4);
+  iconScene.add(iLight);
+
+  let iModel = null;
+
+  function setup(obj) {
+    iModel = obj;
+    const box    = new THREE.Box3().setFromObject(iModel);
+    const center = box.getCenter(new THREE.Vector3());
+    const maxDim = Math.max(...box.getSize(new THREE.Vector3()).toArray());
+    iModel.position.sub(center);
+    iModel.scale.setScalar(1.6 / maxDim);
+    iconScene.add(iModel);
+  }
+
+  if (mtlFile) {
+    const mtlLoader = new MTLLoader();
+    mtlLoader.setPath(dir);
+    mtlLoader.load(mtlFile, (mats) => {
+      mats.preload();
+      const objLoader = new OBJLoader();
+      objLoader.setMaterials(mats);
+      objLoader.load(dir + objFile, setup);
+    }, undefined, err => console.warn('MTL 실패:', dir + mtlFile, err));
+  } else {
+    new OBJLoader().load(dir + objFile, setup, undefined, err => console.warn('OBJ 실패:', dir + objFile, err));
+  }
+
+  (function loop() {
+    requestAnimationFrame(loop);
+    if (iModel) iModel.rotation.y += 0.012;
+    iconRenderer.render(iconScene, iconCam);
+  })();
+}
+
+// ── 아이콘 로드 ──
+loadOBJIcon(document.getElementById('icon-apple'),    'images/apple/',     'Apple.obj',             'Apple.mtl');
+loadOBJIcon(document.getElementById('icon-cake'),     'images/cake/',      'Cake.obj',              'Cake.mtl');
+loadOBJIcon(document.getElementById('icon-instagram'),'images/instagram/', 'insta.obj',             'insta.mtl');
+loadOBJIcon(document.getElementById('icon-cone'),     'images/cone/',      'cone.obj',              'cone.mtl');
+loadOBJIcon(document.getElementById('icon-donut'),    'images/donut/',     'donut.obj',             'donut.mtl');
+loadOBJIcon(document.getElementById('icon-flowers'),  'images/flowers/',   'Flowers_obj.obj',       null);
+loadOBJIcon(document.getElementById('icon-penguin'),  'images/penguin/',   'Penguin.obj',           'Penguin.mtl');
+loadOBJIcon(document.getElementById('icon-pencil'),   'images/pencil/',    'Ołówek v1.obj',         null);
+loadOBJIcon(document.getElementById('icon-scissors'), 'images/scissors/',  'Scissors.obj',          'Scissors.mtl');
+loadOBJIcon(document.getElementById('icon-sneakers'), 'images/sneakers/',  'Sneakers.obj',          'Sneakers.mtl');
+loadOBJIcon(document.getElementById('icon-snoopy'),   'images/snoopy/',    'snoopy.obj',            null);
+loadOBJIcon(document.getElementById('icon-trousers'), 'images/trousers/',  'Trouserst.obj',         'Trouserst.mtl');
+loadOBJIcon(document.getElementById('icon-fire'),     'images/fire/',      'Fire extinguisher.obj', 'Fire extinguisher.mtl');
+loadOBJIcon(document.getElementById('icon-melon'),    'images/melon/',     'melon.obj',             'melon.mtl');
+</script>
+</body>
+</html>
