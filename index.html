@@ -51,7 +51,8 @@
       width: clamp(220px, 28vw, 360px);
       height: clamp(220px, 28vw, 360px);
       z-index: 6;
-      pointer-events: none;
+      pointer-events: auto;
+      cursor: pointer;
       animation: dogBob 3.5s ease-in-out infinite;
     }
     @keyframes dogBob {
@@ -195,7 +196,7 @@
        style="--fd:3.0s;--fl:0.8s"><canvas id="icon-scissors" class="icon-canvas"></canvas></div>
 
   <div class="icon anim-on" data-icon="sneakers"
-       data-href="#"
+       data-href="https://adayofdandan.github.io/test_01/#section-05"
        style="--fd:2.5s;--fl:1.2s"><canvas id="icon-sneakers" class="icon-canvas"></canvas></div>
 
   <div class="icon anim-on" data-icon="snoopy"
@@ -372,6 +373,11 @@ btnToggle.addEventListener('click', () => {
   btnToggle.classList.toggle('active', animOn);
   if (!orbiting) icons.forEach(el => el.classList.toggle('anim-on', animOn));
   if (!animOn && orbiting) stopOrbit();
+});
+
+// ── 중앙 강아지 클릭 ──
+document.getElementById('dog3d').addEventListener('click', () => {
+  window.open('https://minglyportfolio01.imweb.me/18', '_blank');
 });
 
 // ── 초기화: 잠깐 흩어졌다가 궤도 진입 ──
